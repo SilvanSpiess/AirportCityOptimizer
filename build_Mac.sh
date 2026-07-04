@@ -1,0 +1,1 @@
+pyinstaller --noconsole --onefile --icon=resources/Airport_City_Logo.icns --add-data "resources:resources" --distpath="./build" mainwindow.py
