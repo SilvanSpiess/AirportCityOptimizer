@@ -3,7 +3,6 @@
 # ==========================================
 # Ignores all temporary build folders and compiled executables
 build/
-dist/
 *.spec
 
 # ==========================================

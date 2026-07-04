@@ -1,1 +1,1 @@
-pyinstaller --noconsole --onefile --icon=resources/Airport_City_Logo.icns --add-data "resources:resources" --distpath="./build" mainwindow.py
+pyinstaller --noconsole --onefile --name="AirportCityOptimizer" --icon="resources/Airport_City_Logo.icns" --add-data "resources:resources" --collect-binaries z3 mainwindow.py
