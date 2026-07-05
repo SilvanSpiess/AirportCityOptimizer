@@ -5,9 +5,9 @@ from PyQt5.QtCore import Qt
 
 import house_handler_config as hhc
 
-IMAGE_SIZE = 50                                         # Images will be forced to a 50x50 square
-MARGIN_SIZE = 15                                        # Inter-space between image edge and the border line
-BORDER_RADIUS = 12                                      # Rounded corner intensity
+IMAGE_SIZE = 40                                         # Images will be forced to a 50x50 square
+MARGIN_SIZE = 10                                        # Inter-space between image edge and the border line
+BORDER_RADIUS = 10                                      # Rounded corner intensity
 
 class HouseCard(QFrame):
     def __init__(self, house_name, size, on_toggle_callback, parent=None):

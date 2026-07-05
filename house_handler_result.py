@@ -25,7 +25,27 @@ class ResultScreen(QWidget):
         self.main_layout = QVBoxLayout()
         self.main_layout.setSizeConstraint(QVBoxLayout.SetFixedSize)
 
-    def init_ui(self, numerical_result, solution_data):
+    def init_ui_failure(self, duration_string):
+        while self.main_layout.count() > 0:
+            item = self.main_layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+        
+        title = QLabel(f"No Optimal result has been found for the current selection")
+        #title.setObjectName("Title")
+        title.setStyleSheet(hhc.ACTIVE_STYLESHEET)
+        title.setAlignment(Qt.AlignCenter)
+        self.main_layout.addWidget(title)
+
+        info = QLabel(f"Computation took: {duration_string}")
+        info.setStyleSheet(hhc.INACTIVE_STYLESHEET)
+        info.setAlignment(Qt.AlignCenter)
+        self.main_layout.addWidget(info)
+
+        self.setLayout(self.main_layout)
+
+    def init_ui_success(self, numerical_result, solution_data, duration_string):
 
         while self.main_layout.count() > 0:
             item = self.main_layout.takeAt(0)
@@ -34,9 +54,15 @@ class ResultScreen(QWidget):
                 widget.deleteLater()
         
         title = QLabel(f"Layout Render with Optimal result: {numerical_result}")
-        title.setObjectName("Title")
+        #title.setObjectName("Title")
+        title.setStyleSheet(hhc.ACTIVE_STYLESHEET)
         title.setAlignment(Qt.AlignCenter)
         self.main_layout.addWidget(title)
+
+        info = QLabel(f"Computation took: {duration_string}")
+        info.setStyleSheet(hhc.INACTIVE_STYLESHEET)
+        info.setAlignment(Qt.AlignCenter)
+        self.main_layout.addWidget(info)
 
         grid_widget = QWidget()
         self.grid = QGridLayout(grid_widget)

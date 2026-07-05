@@ -48,6 +48,10 @@ IMAGE_DIR = "resources/images"
 
 EXCLUDE_KEYS = {"empty", "visa", "road", "tree"}
 
+ACTIVE_STYLESHEET = "color: #00ffcc; font-weight: bold; font-size: 16px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px; margin-right: 5px;"
+
+INACTIVE_STYLESHEET = "color: #808588; font-weight: bold; font-size: 16px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px; margin-right: 5px;"
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:

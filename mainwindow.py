@@ -1,4 +1,6 @@
 import sys
+import time
+from datetime import timedelta
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QStackedWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel
 )
@@ -17,9 +19,6 @@ DARK_STYLE = """
     QLabel#Title { font-size: 20px; font-weight: bold; color: #00ffcc; padding: 10px; }
 """
 
-ACTIVE_STYLESHEET = "color: #00ffcc; font-weight: bold; font-size: 16px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px; margin-right: 5px;"
-
-INACTIVE_STYLESHEET = "color: #808588; font-weight: bold; font-size: 16px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px; margin-right: 5px;"
 
 class NavigationHeader(QWidget):
     def __init__(self, parent=None):
@@ -30,8 +29,8 @@ class NavigationHeader(QWidget):
         
         self.label_select_houses = QLabel("Select Houses", self)
         self.label_results = QLabel("Results Display", self)
-        self.label_select_houses.setStyleSheet(ACTIVE_STYLESHEET)
-        self.label_results.setStyleSheet(INACTIVE_STYLESHEET)
+        self.label_select_houses.setStyleSheet(hhc.ACTIVE_STYLESHEET)
+        self.label_results.setStyleSheet(hhc.INACTIVE_STYLESHEET)
 
         for btn in [self.label_select_houses, self.label_results]:
             main_layout.addWidget(btn)
@@ -39,21 +38,21 @@ class NavigationHeader(QWidget):
         main_layout.addStretch()
 
         self.btn_switch_state = QPushButton("Optimize", self)
-        self.btn_switch_state.setStyleSheet(ACTIVE_STYLESHEET)
+        self.btn_switch_state.setStyleSheet(hhc.ACTIVE_STYLESHEET)
 
         self.btn_select_all = QPushButton("Select All", self)
-        self.btn_select_all.setStyleSheet(INACTIVE_STYLESHEET)
+        self.btn_select_all.setStyleSheet(hhc.INACTIVE_STYLESHEET)
 
         self.btn_deselect_all = QPushButton("Deselect All", self)
-        self.btn_deselect_all.setStyleSheet(INACTIVE_STYLESHEET)
+        self.btn_deselect_all.setStyleSheet(hhc.INACTIVE_STYLESHEET)
         
         for btn in [self.btn_switch_state, self.btn_select_all, self.btn_deselect_all]:
             btn.setCursor(Qt.PointingHandCursor)
             main_layout.addWidget(btn)
 
     def go_selector(self):
-        self.label_select_houses.setStyleSheet(ACTIVE_STYLESHEET)
-        self.label_results.setStyleSheet(INACTIVE_STYLESHEET)
+        self.label_select_houses.setStyleSheet(hhc.ACTIVE_STYLESHEET)
+        self.label_results.setStyleSheet(hhc.INACTIVE_STYLESHEET)
         self.btn_switch_state.setText("Optimize")
         self.btn_select_all.setEnabled(True)
         self.btn_deselect_all.setEnabled(True)
@@ -64,8 +63,8 @@ class NavigationHeader(QWidget):
         self.btn_deselect_all.setEnabled(False)
 
     def go_results(self):
-        self.label_select_houses.setStyleSheet(INACTIVE_STYLESHEET)
-        self.label_results.setStyleSheet(ACTIVE_STYLESHEET)
+        self.label_select_houses.setStyleSheet(hhc.INACTIVE_STYLESHEET)
+        self.label_results.setStyleSheet(hhc.ACTIVE_STYLESHEET)
         self.btn_switch_state.setText("Return to Selector")
         self.btn_switch_state.setEnabled(True)
 
@@ -78,28 +77,39 @@ class WaitingScreen(QWidget):
         self.message = QLabel("Submission Successful!", self)
         self.message.setStyleSheet("color: #00ffcc; font-size: 28px; font-weight: bold;")
         
-        self.sub_message = QLabel("Your custom house list has been cataloged.\nOptimal Solution is being computed", self)
-        self.sub_message.setStyleSheet("color: #a0a0a0; font-size: 16px; margin-top: 10px;")
+        self.sub_message1 = QLabel("Your custom house list has been cataloged.\nOptimal Solution is being computed", self)
+        self.sub_message1.setStyleSheet("color: #a0a0a0; font-size: 16px; margin-top: 10px;")
+
+        self.sub_message2 = QLabel("Runtime all buildings on \n   - Windows 16 gb RAM: ~2 mins\n   - Mac M4   16 gb RAM: XX mins", self)
+        self.sub_message2.setStyleSheet("color: #a0a0a0; font-size: 14px; margin-top: 10px;")
 
         self.MovieLabel = QLabel(self)
         self.movie = QMovie(hhc.resource_path(hhc.GIF_FILE_NAME))
         self.MovieLabel.setMovie(self.movie)
         self.movie.start()
 
-        layout.addWidget(self.message, alignment=Qt.AlignCenter)
-        layout.addWidget(self.sub_message, alignment=Qt.AlignCenter)
+        layout.addWidget(self.message, alignment=Qt.AlignLeft)
+        layout.addWidget(self.sub_message1, alignment=Qt.AlignLeft)
+        layout.addWidget(self.sub_message2, alignment=Qt.AlignLeft)
         layout.addWidget(self.MovieLabel, alignment=Qt.AlignCenter)
 
 class Z3SolverWorker(QThread):
-    finished = pyqtSignal(bool, object, list)
+    finished = pyqtSignal(bool, object, list, str)
 
     def __init__(self, submitted_data):
         super().__init__()
         self.submitted_data = submitted_data
 
     def run(self):
+        start_time = time.time()
+
         success, numerical_result, Z3_list = z3m.run_z3_solver(self.submitted_data)
-        self.finished.emit(success, numerical_result, Z3_list)
+
+        end_time = time.time()
+        elapsed_seconds = end_time - start_time
+        duration_string = str(timedelta(seconds=int(elapsed_seconds)))
+
+        self.finished.emit(success, numerical_result, Z3_list, duration_string)
 
 class MainWindow(QWidget):
     def __init__(self, data):
@@ -110,7 +120,7 @@ class MainWindow(QWidget):
         self.setWindowIcon(my_icon.iconFromBase64(my_icon.image_base64))
         self.setStyleSheet(DARK_STYLE)
         self.setWindowTitle("Z3 Airport City Solution Viewer")
-        self.setMinimumSize(1500, 1000)
+        self.setMinimumSize(1100, 800)
 
         window_layout = QVBoxLayout(self)
         window_layout.setContentsMargins(10, 10, 10, 10)
@@ -135,7 +145,7 @@ class MainWindow(QWidget):
         window_layout.addWidget(self.header)
         window_layout.addWidget(self.stack)
 
-        self.current_state = 0
+        self.current_state = "SELECT_HOUSES"
 
     def update_global_selection(self, name, select_status):
         if select_status:
@@ -167,9 +177,11 @@ class MainWindow(QWidget):
             self.header.go_selector()
             self.current_state = "SELECT_HOUSES"
 
-    def on_solver_completed(self, success, numerical_result, Z3_list):
-        self.result_screen.init_ui(numerical_result, Z3_list)
-
+    def on_solver_completed(self, success, numerical_result, Z3_list, duration_string):
+        if success:
+            self.result_screen.init_ui_success(numerical_result, Z3_list, duration_string)
+        else:
+            self.result_screen.init_ui_failure(duration_string)
         self.stack.setCurrentIndex(2)
         self.header.go_results()
 

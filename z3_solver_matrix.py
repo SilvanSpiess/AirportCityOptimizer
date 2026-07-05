@@ -69,7 +69,7 @@ def run_z3_solver(HOUSE: dict):
    field_width = 9
    field_height = 9
    visa_locs = [(4, 4)]
-   visa_range = 2
+   visa_range = 1
 
    meta_keys = ["empty", "visa", "road", "tree"]
    META_ID = {name: i for i, name in enumerate(meta_keys)}
