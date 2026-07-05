@@ -19,7 +19,6 @@ DARK_STYLE = """
     QLabel#Title { font-size: 20px; font-weight: bold; color: #00ffcc; padding: 10px; }
 """
 
-
 class NavigationHeader(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -80,7 +79,7 @@ class WaitingScreen(QWidget):
         self.sub_message1 = QLabel("Your custom house list has been cataloged.\nOptimal Solution is being computed", self)
         self.sub_message1.setStyleSheet("color: #a0a0a0; font-size: 16px; margin-top: 10px;")
 
-        self.sub_message2 = QLabel("Runtime all buildings on \n   - Windows 16 gb RAM: ~2 mins\n   - Mac M4   16 gb RAM: XX mins", self)
+        self.sub_message2 = QLabel("Runtime all buildings on \n   - Windows 16 gb RAM:       ~ 2 mins\n   - Mac M4   16 gb Memory: < 1 min", self)
         self.sub_message2.setStyleSheet("color: #a0a0a0; font-size: 14px; margin-top: 10px;")
 
         self.MovieLabel = QLabel(self)
@@ -108,6 +107,8 @@ class Z3SolverWorker(QThread):
         end_time = time.time()
         elapsed_seconds = end_time - start_time
         duration_string = str(timedelta(seconds=int(elapsed_seconds)))
+
+        print(f"INFO - Computation time is {duration_string}")
 
         self.finished.emit(success, numerical_result, Z3_list, duration_string)
 
@@ -162,6 +163,7 @@ class MainWindow(QWidget):
                 for house_name in self.selected_houses
             }
 
+            print("INFO - Submitted selected houses for computation")
             self.stack.setCurrentIndex(1)
             self.header.go_waiting()
             
@@ -172,10 +174,12 @@ class MainWindow(QWidget):
             # ----
 
             self.current_state = "DISPLAY_RESULTS"
+            print("INFO - Moved to Result screen")
         else:
             self.stack.setCurrentIndex(0)
             self.header.go_selector()
             self.current_state = "SELECT_HOUSES"
+            print("INFO - Moved to Selector screen")
 
     def on_solver_completed(self, success, numerical_result, Z3_list, duration_string):
         if success:
